@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FT AML Platform — API Reference</title>
+<style>
+  :root{
+    --accent:#352EFF;
+    --magenta:#FF00FF;
+    --arrow:#FF0080;
+    --dark:#000000;
+    --slate:#302E45;
+    --muted:#6B6B6B;
+    --border:#E5E5E5;
+    --code-bg:#171717;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:#FFFFFF; color:var(--slate);
+    font-family: "DejaVu Sans", Verdana, Arial, sans-serif;
+    font-size:15px; line-height:1.65;
+  }
+  a{color:var(--accent); text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  code, pre, .mono{font-family:"Courier New", Consolas, monospace;}
+
+  header.topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 40px; border-bottom:1px solid var(--border);
+    position:sticky; top:0; background:#FFFFFF; z-index:10;
+  }
+  .brand{display:flex; align-items:center; gap:10px;}
+  .brand img{height:26px; width:auto;}
+  .brand span{font-weight:bold; color:var(--dark); font-size:14px; letter-spacing:.3px;}
+  nav.toplinks{display:flex; gap:22px;}
+  nav.toplinks a{font-size:13px; color:var(--slate); font-weight:bold;}
+  nav.toplinks a:hover{color:var(--accent);}
+
+  .wrap{max-width:900px; margin:0 auto; padding:0 40px;}
+
+  .hero{padding:64px 0 40px;}
+  .eyebrow{color:var(--accent); font-weight:bold; font-size:13px; letter-spacing:1px; text-transform:uppercase; margin:0 0 10px;}
+  h1{font-size:40px; color:var(--dark); margin:0 0 14px; font-weight:bold;}
+  .underline{width:70px; height:4px; background:var(--magenta); border:none; margin:0 0 22px;}
+  .lead{color:var(--muted); font-size:17px; max-width:620px; margin:0;}
+
+  section{padding:36px 0; border-top:1px solid var(--border);}
+  h2{font-size:24px; color:var(--dark); margin:0 0 14px; font-weight:bold;}
+  h3{font-size:17px; color:var(--accent); margin:26px 0 8px; font-weight:bold;}
+  p{margin:0 0 14px;}
+
+  ul.arrow{list-style:none; margin:0 0 16px; padding:0;}
+  ul.arrow li{position:relative; padding-left:24px; margin-bottom:8px;}
+  ul.arrow li::before{content:"→"; position:absolute; left:0; color:var(--arrow); font-weight:bold;}
+
+  table{width:100%; border-collapse:collapse; margin:14px 0 22px; font-size:13.5px;}
+  thead th{background:var(--accent); color:#fff; text-align:left; padding:9px 12px; font-weight:bold;}
+  tbody td{padding:9px 12px; border-bottom:1px solid var(--border); vertical-align:top;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.method{font-family:"Courier New",monospace; font-weight:bold; white-space:nowrap;}
+  .m-get{color:#185FA5;} .m-post{color:#0F6E56;} .m-patch{color:#854F0B;}
+
+  pre.code{
+    background:var(--code-bg); color:#F1EFE8; border-radius:6px;
+    padding:16px 18px; overflow-x:auto; font-size:13px; line-height:1.6; margin:12px 0 20px;
+  }
+  pre.code .k{color:#85B7EB;} 
+  pre.code .s{color:#9FE1CB;}
+  pre.code .c{color:#888780;}
+
+  .callout{
+    border-left:4px solid var(--arrow); background:#FBEAF0;
+    padding:14px 18px; border-radius:0 6px 6px 0; margin:0 0 24px;
+    font-size:14px; color:var(--slate);
+  }
+  .callout strong{color:var(--dark);}
+
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+  .card{border:1px solid var(--border); border-radius:8px; padding:18px 20px;}
+  .card h4{margin:0 0 6px; font-size:14px; color:var(--dark);}
+  .card p{margin:0; font-size:13.5px; color:var(--muted);}
+
+  footer{padding:40px 0 60px; border-top:1px solid var(--border); color:var(--muted); font-size:13px;}
+  .footlogo{display:flex; align-items:center; gap:8px; margin-bottom:10px;}
+  .footlogo img{height:18px;}
+
+  @media (max-width:640px){
+    .wrap{padding:0 20px;}
+    header.topbar{padding:12px 20px;}
+    nav.toplinks{display:none;}
+    h1{font-size:30px;}
+    .grid2{grid-template-columns:1fr;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAA3CAYAAACxUDzgAAAFMElEQVR4nO2b208cVRzHP2dmd9gL5SaUApamLXKzFjUmXt6M/4UxxicT/4f64Ksvvmv00fg3GE2MsVYTY9RepOClUCgptTegFnZ2zvHhx2Yh3ZmdMzNb6LrfZBPgsOf8+JzfOb/LLMoYY+joETkHbcBhVQdMiDpgQtQBE6IOmBDlbN/g+3D5EnzzFTzx8UzB8DC8+fajQ4nA/HgBvvg8C8sOVq4L777XeMwaTFCF1RXQOq1ZBy/XhZOnG49Z3zG+DyvLaU06HMp7cHy88Zg1mJ0dWFlJa9Lh0OAgFAqNx6zABAHcWIF/H2Rh1sFrcAg8r/GYNZjFxfa4X0DA5LMAozUsLgigJ13KgdFRyOcbj1uB8SuwfK0N8hfAdWDsuESmRrIC8+ABbG5mYdbBy3FgfDwjMFtb7QOmWIRjI1l5zJbAaQedOBkeqsECjNawtARVPwuzDl4Tz0AuIu+PXxIYOHoU3noHTBuE61deg66u8HFl0/Nth2hUk1LR41ZFZLPJ2klWYB6HxzSCn2TdtJsYC0wQwIXz8OnHUKmkBxR2R3Ufgfc/gPET8r3vw2efwIXvILC417o8OLc7j5OwRxkLTK0UWLgK1Wqyhfaq0WYa4KkBONJT/1kQwA/fw9V50DE3QwE9PdDXn87GpmCMEQNXrkuTKouI1OhvVLsperFY/9nmJqzdkI2J66XKEU/xvHTHqamjGSNestriHozrwLNn9rv+6nU5TjZHVymYnI7OUeIoHhhfdq6Vl6/rwpmzkNuToi8v2VfyrguTUzJPSz1Ga3Hpf261FoznwekJcPaAWVqS42ujXB7Gnt4/TxLFAvM4ejC9fVAq7Vk3gJtr9k2xUhF6etPb0xRMEMD8lfQLNVP/AHi7KXrtXltftwdTLElUSqtYHjP/e2uPkVLQ3y/5B9TB3Fq3v3i7u6Hcnd6mSDBaw842rN9Mv1CUlILRsf2RZGMD7t218xil4NTp8Aa3jSLBGCNdu1b3YHI5efC198K8fDFZRJqeDW8+2aipxzx8CFubrQ/Vp07Vcxhj4Ldf7MoAkPdPTmUDJjIN0hru3hE40LrqulCQJ4I1MFrDpYv2WXa5ezdUZ/AZjkgwVR8W5mUH83l4bg5ef0MWL5Ulfc979don1PVNdI3lefUQa4w80LuVIG8aGQl/HGKrSDBBAFcuy9fVKlz8Fa5cElctd8PIKAwMCKTpGZh7AYaGpDNWLNl5WO13jYH7G7D9MH7hWNPImCR4WSgSjO9LqAYx2PflBXIp16KV48DXX8pu5T2YmYUPP0q2e8bAxn3YqdC42gyRUrJRaWukmkKn0Rru3YM7t5tPojVsb8srl5NELWkVrrWUH5Ud+xxmdFSK0SwUOk0Q1Et+GykFk5NS/ieR0fDnH1bOAoCbg+Fj6WukmkLN14EcFdvGlOPAxGTyyBBoaYjZksm52UUkiOExNu7sOHKvDA417tLFkdaweNU+IvX0Sr3VcjCVCtxYtTfQ64K+PhKRMQZu35bcyVYzs9ldvBABxvcFjNVkjuQkfX3JkkGtpWuXpK88PZudt0ATj1lbs5tMOXKMbHOYmrSWrl21ah+Rpqb3d//SKhTM+rrUSDZyHTg7l7x00Fqa7rYVdaEAQ0ezi0gQAWb5mn2odnMw93xyY4KqRELbe61clu7fYzlKf/+VrOyfPZPcY6pV+96PUlKelMrZFrmhD/XPfwsVi0cXSsnF+/KryaOD78PPP0m5EVdKice8+FK2Ucnq0w7/J3X++yREHTAh6oAJUQdMiP4Dc17RxAtc7oQAAAAASUVORK5CYII=" alt="FT logo">
+    <span>FYSCAL TECHNOLOGIES</span>
+  </div>
+  <nav class="toplinks">
+    <a href="#overview">Overview</a>
+    <a href="#auth">Authentication</a>
+    <a href="#concepts">Core concepts</a>
+    <a href="#endpoints">Endpoints</a>
+    <a href="#webhooks">Webhooks</a>
+    <a href="#errors">Errors</a>
+  </nav>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <p class="eyebrow">Developer documentation</p>
+    <h1>FT AML Platform API</h1>
+    <hr class="underline">
+    <p class="lead">Integrate screening, transaction monitoring, and case management directly into your own systems — submit records, evaluate them against your configured rules, and receive alerts back, without leaving your existing workflow.</p>
+  </div>
+
+  <section id="overview">
+    <h2>Overview</h2>
+    <p>The FT AML API lets your systems talk to the AML Platform directly: push customer or transaction data in, and get screening results, alerts, and case updates back — either by polling or by subscribing to webhooks.</p>
+    <ul class="arrow">
+      <li>All requests and responses use JSON over HTTPS.</li>
+      <li>Every request requires a bearer token (see Authentication below).</li>
+      <li>Endpoints are grouped by the same modules used in the platform itself: Name Screening, Transaction Monitoring, Case Management, and Data Ingestion.</li>
+    </ul>
+    <div class="grid2">
+      <div class="card"><h4>Base URL</h4><p class="mono">https://api.ftaml.example/v1</p></div>
+      <div class="card"><h4>Format</h4><p>JSON request and response bodies, UTF-8 encoded</p></div>
+    </div>
+  </section>
+
+  <section id="auth">
+    <h2>Authentication</h2>
+    <p>Every request must include a bearer token issued to your organization. Contact your account team to generate one.</p>
+    <pre class="code">Authorization: Bearer &lt;api_token&gt;
+Content-Type: application/json</pre>
+    <p>Tokens are scoped per environment — use a sandbox token while integrating, and switch to a production token only once your integration is verified.</p>
+  </section>
+
+  <section id="concepts">
+    <h2>Core concepts</h2>
+    <p>Two ideas show up throughout the API, carried over directly from how the platform itself works:</p>
+    <h3>Variables</h3>
+    <p>A named, reusable calculation over your data — e.g. <code>count_sender_txns_1_week</code>. Rules reference variables instead of repeating raw logic.</p>
+    <h3>Typologies</h3>
+    <p>The category of suspicious behavior a rule detects (e.g. <em>Smurfing</em>). Every alert the API returns is tagged with the typology that triggered it, so your system knows not just <em>that</em> something fired, but <em>why</em>.</p>
+  </section>
+
+  <section id="endpoints">
+    <h2>Endpoints reference</h2>
+    <div class="callout">
+      <strong>Draft — pending verification.</strong> These paths and payload shapes are a proposed structure based on the platform's feature set. No confirmed API specification was available while drafting this page — check every path, field name, and status code against the real implementation before this goes live.
+    </div>
+
+    <h3>Name screening</h3>
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td class="method m-post">POST /screening/manual</td><td>Submit a single individual or entity for manual screening</td></tr>
+        <tr><td class="method m-post">POST /screening/batch</td><td>Submit a batch of records for screening</td></tr>
+        <tr><td class="method m-get">GET /screening/jobs/{jobId}</td><td>Check the status of a batch or delta screening job</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Transaction monitoring</h3>
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td class="method m-get">GET /variables</td><td>List available variables</td></tr>
+        <tr><td class="method m-post">POST /variables</td><td>Create a new variable</td></tr>
+        <tr><td class="method m-get">GET /typologies</td><td>List transaction monitoring typologies (rules)</td></tr>
+        <tr><td class="method m-post">POST /typologies</td><td>Create or update a typology</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Case management</h3>
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td class="method m-get">GET /alerts</td><td>Query alerts by severity, status, or date</td></tr>
+        <tr><td class="method m-patch">PATCH /cases/{caseId}/disposition</td><td>Record an investigation outcome on a case</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Data ingestion</h3>
+    <table>
+      <thead><tr><th>Method &amp; path</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td class="method m-get">GET /ingestion/watchlist/jobs</td><td>List watchlist ingestion job history</td></tr>
+        <tr><td class="method m-get">GET /ingestion/tms/jobs</td><td>List transaction data ingestion job history</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Example — manual screening request</h3>
+    <pre class="code">POST /screening/manual
+Authorization: Bearer &lt;api_token&gt;
+Content-Type: application/json
+
+{
+  <span class="k">"name"</span>: <span class="s">"John Doe"</span>,
+  <span class="k">"entity_type"</span>: <span class="s">"individual"</span>,
+  <span class="k">"dob"</span>: <span class="s">"1985-04-12"</span>,
+  <span class="k">"citizenship"</span>: <span class="s">"GBR"</span>
+}</pre>
+    <pre class="code"><span class="c">200 OK</span>
+{
+  <span class="k">"screening_id"</span>: <span class="s">"SCR-88213"</span>,
+  <span class="k">"status"</span>: <span class="s">"completed"</span>,
+  <span class="k">"match_score"</span>: 91,
+  <span class="k">"matches"</span>: [
+    { <span class="k">"watchlist_id"</span>: <span class="s">"WL-3391"</span>, <span class="k">"name"</span>: <span class="s">"Jon Doe"</span>, <span class="k">"score"</span>: 91, <span class="k">"category"</span>: <span class="s">"PEP"</span> }
+  ]
+}</pre>
+  </section>
+
+  <section id="webhooks">
+    <h2>Webhooks</h2>
+    <p>Subscribe to receive alerts as they're generated, instead of polling. Configure your callback URL in Account &gt; Integrations.</p>
+    <h3>Example — alert created</h3>
+    <pre class="code">POST &lt;your_webhook_url&gt;
+Content-Type: application/json
+
+{
+  <span class="k">"event"</span>: <span class="s">"alert.created"</span>,
+  <span class="k">"alert_id"</span>: <span class="s">"ALT-55012"</span>,
+  <span class="k">"typology_id"</span>: <span class="s">"TYP-2031"</span>,
+  <span class="k">"account_id"</span>: <span class="s">"ACC-77410"</span>,
+  <span class="k">"risk_score"</span>: 78,
+  <span class="k">"severity"</span>: <span class="s">"High"</span>,
+  <span class="k">"sla_deadline"</span>: <span class="s">"2026-07-13T09:00:00Z"</span>
+}</pre>
+    <p>Retry policy, signing secret, and delivery guarantees: to be confirmed with engineering.</p>
+  </section>
+
+  <section id="errors">
+    <h2>Errors</h2>
+    <p>Failed requests return a JSON error body alongside a standard HTTP status code:</p>
+    <pre class="code">{
+  <span class="k">"error"</span>: {
+    <span class="k">"code"</span>: <span class="s">"invalid_request"</span>,
+    <span class="k">"message"</span>: <span class="s">"citizenship must be a valid ISO-3166 country code"</span>
+  }
+}</pre>
+    <table>
+      <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+      <tbody>
+        <tr><td>400</td><td>Request was malformed or failed validation</td></tr>
+        <tr><td>401</td><td>Missing or invalid bearer token</td></tr>
+        <tr><td>404</td><td>Resource not found (e.g. unknown job or case ID)</td></tr>
+        <tr><td>429</td><td>Rate limit exceeded — see below</td></tr>
+        <tr><td>500</td><td>Unexpected server error — retry with backoff</td></tr>
+      </tbody>
+    </table>
+    <h3>Rate limits &amp; versioning</h3>
+    <p>Default rate limits and API version deprecation policy: to be confirmed with engineering before publishing.</p>
+  </section>
+
+  <footer>
+    <div class="footlogo">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEYAAAA3CAYAAACxUDzgAAAFMElEQVR4nO2b208cVRzHP2dmd9gL5SaUApamLXKzFjUmXt6M/4UxxicT/4f64Ksvvmv00fg3GE2MsVYTY9RepOClUCgptTegFnZ2zvHhx2Yh3ZmdMzNb6LrfZBPgsOf8+JzfOb/LLMoYY+joETkHbcBhVQdMiDpgQtQBE6IOmBDlbN/g+3D5EnzzFTzx8UzB8DC8+fajQ4nA/HgBvvg8C8sOVq4L777XeMwaTFCF1RXQOq1ZBy/XhZOnG49Z3zG+DyvLaU06HMp7cHy88Zg1mJ0dWFlJa9Lh0OAgFAqNx6zABAHcWIF/H2Rh1sFrcAg8r/GYNZjFxfa4X0DA5LMAozUsLgigJ13KgdFRyOcbj1uB8SuwfK0N8hfAdWDsuESmRrIC8+ABbG5mYdbBy3FgfDwjMFtb7QOmWIRjI1l5zJbAaQedOBkeqsECjNawtARVPwuzDl4Tz0AuIu+PXxIYOHoU3noHTBuE61deg66u8HFl0/Nth2hUk1LR41ZFZLPJ2klWYB6HxzSCn2TdtJsYC0wQwIXz8OnHUKmkBxR2R3Ufgfc/gPET8r3vw2efwIXvILC417o8OLc7j5OwRxkLTK0UWLgK1Wqyhfaq0WYa4KkBONJT/1kQwA/fw9V50DE3QwE9PdDXn87GpmCMEQNXrkuTKouI1OhvVLsperFY/9nmJqzdkI2J66XKEU/xvHTHqamjGSNestriHozrwLNn9rv+6nU5TjZHVymYnI7OUeIoHhhfdq6Vl6/rwpmzkNuToi8v2VfyrguTUzJPSz1Ga3Hpf261FoznwekJcPaAWVqS42ujXB7Gnt4/TxLFAvM4ejC9fVAq7Vk3gJtr9k2xUhF6etPb0xRMEMD8lfQLNVP/AHi7KXrtXltftwdTLElUSqtYHjP/e2uPkVLQ3y/5B9TB3Fq3v3i7u6Hcnd6mSDBaw842rN9Mv1CUlILRsf2RZGMD7t218xil4NTp8Aa3jSLBGCNdu1b3YHI5efC198K8fDFZRJqeDW8+2aipxzx8CFubrQ/Vp07Vcxhj4Ldf7MoAkPdPTmUDJjIN0hru3hE40LrqulCQJ4I1MFrDpYv2WXa5ezdUZ/AZjkgwVR8W5mUH83l4bg5ef0MWL5Ulfc979don1PVNdI3lefUQa4w80LuVIG8aGQl/HGKrSDBBAFcuy9fVKlz8Fa5cElctd8PIKAwMCKTpGZh7AYaGpDNWLNl5WO13jYH7G7D9MH7hWNPImCR4WSgSjO9LqAYx2PflBXIp16KV48DXX8pu5T2YmYUPP0q2e8bAxn3YqdC42gyRUrJRaWukmkKn0Rru3YM7t5tPojVsb8srl5NELWkVrrWUH5Ud+xxmdFSK0SwUOk0Q1Et+GykFk5NS/ieR0fDnH1bOAoCbg+Fj6WukmkLN14EcFdvGlOPAxGTyyBBoaYjZksm52UUkiOExNu7sOHKvDA417tLFkdaweNU+IvX0Sr3VcjCVCtxYtTfQ64K+PhKRMQZu35bcyVYzs9ldvBABxvcFjNVkjuQkfX3JkkGtpWuXpK88PZudt0ATj1lbs5tMOXKMbHOYmrSWrl21ah+Rpqb3d//SKhTM+rrUSDZyHTg7l7x00Fqa7rYVdaEAQ0ezi0gQAWb5mn2odnMw93xyY4KqRELbe61clu7fYzlKf/+VrOyfPZPcY6pV+96PUlKelMrZFrmhD/XPfwsVi0cXSsnF+/KryaOD78PPP0m5EVdKice8+FK2Ucnq0w7/J3X++yREHTAh6oAJUQdMiP4Dc17RxAtc7oQAAAAASUVORK5CYII=" alt="FT logo">
+      <strong style="color:#000;">FYSCAL TECHNOLOGIES</strong>
+    </div>
+    <p>Questions this page doesn't answer? Email <a href="mailto:developers@ftaml.example">developers@ftaml.example</a>.</p>
+  </footer>
+
+</div>
+</body>
+</html>
