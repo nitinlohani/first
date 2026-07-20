@@ -1,1 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FT AML Platform — API Reference | FyscalTech</title>
+<meta name="description" content="Developer reference for the FT AML Platform API — authentication, endpoints, webhooks, and error handling.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --accent:#352EFF;
+  --accent-2:#5B54FF;
+  --accent-soft:#EAEAFF;
+  --dark:#171717;
+  --grey:#575757;
+  --grey-light:#8A8A8A;
+  --border:#E7E7EF;
+  --bg-card:#F7F8FC;
+  --white:#FFFFFF;
+  --code-bg:#171717;
+  --get:#352EFF;
+  --post:#0F9D74;
+  --patch:#B7791F;
+  --radius-lg:20px;
+  --radius-md:14px;
+  --radius-sm:9px;
+  --sidebar-w:260px;
+  --topbar-h:76px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+html,body{overflow-x:hidden; max-width:100%;}
+body{
+  margin:0; background:var(--white); color:var(--dark);
+  font-family:'Inter',system-ui,sans-serif; font-size:15.5px; line-height:1.7;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4,nav a,.btn,.eyebrow,.side-link,.sec-tag{font-family:'Poppins',sans-serif;}
+a{color:inherit; text-decoration:none;}
+ul{margin:0; padding:0;} li{list-style:none;}
+img{max-width:100%; display:block;}
+code{font-family:'IBM Plex Mono',Consolas,monospace; background:var(--accent-soft); color:var(--accent); padding:1px 6px; border-radius:5px; font-size:.88em;}
+em{color:var(--dark); font-style:italic;}
+
+.bg-grid{
+  position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background-image:
+    linear-gradient(rgba(53,46,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(53,46,255,0.05) 1px, transparent 1px);
+  background-size:64px 64px;
+  mask-image:linear-gradient(to bottom, black, transparent 90%);
+}
+
+.topbar{
+  position:sticky; top:0; z-index:100; height:var(--topbar-h);
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:0 40px; background:rgba(255,255,255,0.9); backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+}
+.brand{display:flex; align-items:center; gap:10px; min-width:0; flex-shrink:1;}
+.brand img{height:34px; width:auto; flex-shrink:1; min-width:0; max-width:100%;}
+.crumb{display:flex; align-items:center; gap:8px; font-size:13.5px; color:var(--grey); font-weight:500;}
+.crumb .sep{color:#C9C9D6;}
+.crumb .current{color:var(--dark); font-weight:600;}
+.top-actions{display:flex; align-items:center; gap:18px; flex:none;}
+.top-actions a.back{font-size:13.5px; font-weight:600; color:var(--grey);}
+.btn{
+  display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:14px;
+  padding:11px 22px; border-radius:999px; cursor:pointer; border:none;
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.btn-primary{background:var(--accent); color:#fff; box-shadow:0 8px 20px rgba(53,46,255,0.25);}
+.btn-primary:hover{transform:translateY(-1px); box-shadow:0 10px 26px rgba(53,46,255,0.32);}
+
+.hero{position:relative; padding:72px 40px 56px; max-width:1180px; margin:0 auto;}
+.eyebrow{
+  display:inline-flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700;
+  letter-spacing:.04em; text-transform:uppercase; color:var(--accent);
+  background:var(--accent-soft); padding:7px 14px; border-radius:999px; margin-bottom:22px;
+}
+.hero h1{font-size:46px; font-weight:700; line-height:1.14; margin:0 0 18px; letter-spacing:-.01em;}
+.hero h1 .blue{color:var(--accent);}
+.hero-lead{font-size:17.5px; color:var(--grey); max-width:660px; margin:0 0 28px;}
+.hero-stats{display:flex; flex-wrap:wrap; gap:22px 32px;}
+.hero-stats .stat{display:flex; align-items:center; gap:9px; font-size:14.5px; font-weight:600; color:var(--dark);}
+.stat .tick{
+  width:20px; height:20px; border-radius:50%; background:var(--accent); color:#fff;
+  display:flex; align-items:center; justify-content:center; font-size:11px; flex:none;
+}
+
+.layout{max-width:1180px; margin:0 auto; padding:0 40px 100px; display:flex; gap:56px; align-items:flex-start;}
+.sidebar{
+  width:var(--sidebar-w); flex:none; position:sticky; top:calc(var(--topbar-h) + 28px);
+  max-height:calc(100vh - var(--topbar-h) - 56px); overflow-y:auto; padding-right:6px;
+}
+.sidebar::-webkit-scrollbar{width:5px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border); border-radius:3px;}
+.side-title{font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--grey-light); margin-bottom:14px;}
+.side-link{
+  display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:10px;
+  font-size:13.8px; font-weight:600; color:var(--grey); margin-bottom:2px;
+  transition:background .15s ease, color .15s ease;
+}
+.side-num{
+  display:inline-flex; align-items:center; justify-content:center; flex:none;
+  width:26px; height:26px; border-radius:8px; font-family:'IBM Plex Mono',Consolas,monospace;
+  font-size:12px; font-weight:700; background:var(--bg-card); color:var(--grey-light);
+  transition:background .15s ease, color .15s ease;
+}
+.side-link.active .side-num{background:var(--accent); color:#fff;}
+.side-link:hover .side-num{color:var(--dark);}
+.side-link:hover{background:var(--bg-card); color:var(--dark);}
+.side-link.active{background:var(--accent-soft); color:var(--accent);}
+
+.content{flex:1; min-width:0;}
+.doc-section{padding:40px 0 8px; border-top:1px solid var(--border);}
+.doc-section:first-child{border-top:none; padding-top:8px;}
+.sec-tag{
+  display:inline-block; font-size:12px; font-weight:700; letter-spacing:.05em; text-transform:uppercase;
+  color:var(--accent); background:var(--accent-soft); padding:5px 12px; border-radius:999px; margin-bottom:14px;
+}
+.doc-section h2{font-size:26px; font-weight:700; margin:0 0 12px; letter-spacing:-.01em;}
+h3{font-size:17px; font-weight:700; margin:30px 0 10px;}
+p{margin:0 0 14px; color:var(--grey);}
+strong{color:var(--dark); font-weight:600;}
+
+ul.check-list{margin:0 0 18px;}
+ul.check-list li{position:relative; padding-left:30px; margin-bottom:11px; color:var(--grey); font-size:15px;}
+ul.check-list li::before{
+  content:"✓"; position:absolute; left:0; top:1px; width:19px; height:19px; border-radius:50%;
+  background:var(--accent-soft); color:var(--accent); font-size:11px; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+}
+
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:0 0 22px;}
+.card{background:var(--bg-card); border:1px solid var(--border); border-radius:var(--radius-md); padding:18px 20px;}
+.card h4{margin:0 0 6px; font-size:12.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--accent);}
+.card p{margin:0; font-size:14px; color:var(--dark); font-family:'IBM Plex Mono',monospace;}
+
+.callout{
+  display:flex; flex-direction:column; gap:6px; background:linear-gradient(135deg,#FFF3E0,#F7F8FC);
+  border-left:3px solid var(--patch); border-radius:0 var(--radius-md) var(--radius-md) 0;
+  padding:16px 20px; margin:0 0 22px;
+}
+.callout strong{color:var(--dark);}
+.callout p{margin:0; color:var(--dark); font-size:14.5px;}
+
+.table-wrap{overflow-x:auto; margin:14px 0 26px; border:1px solid var(--border); border-radius:var(--radius-md); position:relative; -webkit-overflow-scrolling:touch;}
+.table-wrap.scrollable::after{
+  content:''; position:absolute; top:0; right:0; bottom:0; width:22px; pointer-events:none;
+  box-shadow:inset -14px 0 10px -10px rgba(23,23,23,0.28);
+  opacity:1; transition:opacity .2s ease; border-radius:0 var(--radius-md) var(--radius-md) 0;
+}
+.table-wrap.scrollable.at-end::after{opacity:0;}
+table{width:100%; border-collapse:collapse; font-size:13.6px;}
+thead th{background:var(--dark); color:#fff; text-align:left; padding:11px 16px; font-weight:600; font-family:'Poppins',sans-serif;}
+tbody td{padding:11px 16px; border-top:1px solid var(--border); color:var(--grey); vertical-align:top;}
+tbody tr:nth-child(even){background:var(--bg-card);}
+td.method{font-family:'IBM Plex Mono',monospace; font-weight:600; white-space:nowrap;}
+.m-get{color:var(--get);} .m-post{color:var(--post);} .m-patch{color:var(--patch);}
+.pill{display:inline-block; font-size:11px; font-weight:700; padding:2px 9px; border-radius:999px; margin-right:8px;}
+.pill-get{background:#EAEAFF; color:var(--get);}
+.pill-post{background:#E4F7EF; color:var(--post);}
+.pill-patch{background:#FCF1DE; color:var(--patch);}
+
+pre.code{
+  background:var(--code-bg); color:#F1EFE8; border-radius:var(--radius-md);
+  padding:20px 22px; overflow-x:auto; font-size:13px; line-height:1.7; margin:14px 0 24px;
+  font-family:'IBM Plex Mono',Consolas,monospace;
+  box-shadow:0 20px 44px -24px rgba(23,23,23,0.35);
+}
+pre.code .k{color:#8FB8FF;}
+pre.code .s{color:#9FE1CB;}
+pre.code .c{color:#9A9AA6;}
+pre.code .m{color:#FFB199;}
+
+.thanks{text-align:center; font-weight:600; color:var(--dark); margin-top:28px;}
+
+/* ---------- Dynamic UI additions ---------- */
+.scroll-progress{
+  position:fixed; top:0; left:0; height:3px; width:0%; z-index:1000;
+  background:linear-gradient(90deg, var(--accent), var(--accent-2));
+  transition:width .08s linear; box-shadow:0 0 8px rgba(53,46,255,0.5);
+}
+.bg-blob{
+  position:fixed; z-index:-1; border-radius:50%; filter:blur(90px); pointer-events:none; opacity:.35;
+}
+.blob-a{
+  width:480px; height:480px; top:-160px; right:-140px;
+  background:radial-gradient(circle at 30% 30%, var(--accent), transparent 70%);
+}
+.blob-b{
+  width:420px; height:420px; top:900px; left:-160px;
+  background:radial-gradient(circle at 30% 30%, var(--accent-2), transparent 70%);
+}
+.back-to-top{
+  position:fixed; right:28px; bottom:28px; z-index:200;
+  width:46px; height:46px; border-radius:50%; border:none; cursor:pointer;
+  background:var(--accent); color:#fff; font-size:18px; font-weight:700;
+  box-shadow:0 10px 26px rgba(53,46,255,0.35);
+  display:flex; align-items:center; justify-content:center;
+  opacity:0; visibility:hidden; transform:translateY(12px);
+  transition:opacity .25s ease, transform .25s ease, visibility .25s ease, box-shadow .15s ease;
+}
+.back-to-top.show{opacity:1; visibility:visible; transform:translateY(0);}
+.back-to-top:hover{box-shadow:0 14px 32px rgba(53,46,255,0.45); transform:translateY(-2px);}
+
+.doc-section{opacity:0.001; transform:translateY(14px); transition:opacity .6s ease, transform .6s ease;}
+.doc-section.in-view{opacity:1; transform:translateY(0);}
+.no-js .doc-section{opacity:1; transform:none;}
+
+.doc-section h2{position:relative;}
+.h2-anchor{
+  opacity:0; margin-left:10px; font-size:16px; color:var(--accent); font-weight:600;
+  transition:opacity .15s ease; cursor:pointer; vertical-align:middle;
+}
+.doc-section h2:hover .h2-anchor{opacity:1;}
+
+.code-wrap{position:relative;}
+.code-copy{
+  position:absolute; top:12px; right:12px; z-index:2;
+  background:rgba(255,255,255,0.08); color:#F1EFE8; border:1px solid rgba(255,255,255,0.15);
+  border-radius:7px; font-size:12px; font-weight:600; padding:6px 12px; cursor:pointer;
+  font-family:'Inter',sans-serif; transition:background .15s ease, color .15s ease;
+}
+.code-copy:hover{background:var(--accent); border-color:var(--accent); color:#fff;}
+.code-copy.copied{background:var(--post); border-color:var(--post); color:#fff;}
+
+.card, .table-wrap, pre.code{transition:transform .2s ease, box-shadow .2s ease;}
+.card:hover{transform:translateY(-2px); box-shadow:0 12px 26px rgba(23,23,23,0.08);}
+
+
+
+
+footer{background:var(--dark); color:#B7B7C3; padding:56px 40px 30px; margin-top:40px;}
+.foot-inner{max-width:1180px; margin:0 auto;}
+.foot-top{display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:20px; padding-bottom:28px; border-bottom:1px solid rgba(255,255,255,0.1);}
+.foot-brand{display:flex; align-items:center; gap:10px;}
+.foot-brand img{height:28px; width:auto;}
+footer .btn-primary{box-shadow:none;}
+.foot-bottom{padding-top:22px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:12px; font-size:12.8px; color:#7B7B8A;}
+
+.menu-toggle{display:none; background:none; border:none; color:var(--dark); font-size:20px; cursor:pointer; width:38px; height:38px; border-radius:9px; align-items:center; justify-content:center;}
+.menu-toggle:hover{background:var(--bg-card);}
+.sidebar-overlay{display:none; position:fixed; inset:0; background:rgba(17,17,17,0.42); z-index:149;}
+.sidebar-overlay.show{display:block;}
+.sidebar-cta{display:none;}
+
+/* ---------- Tablet & mobile ---------- */
+@media (max-width:900px){
+  .layout{flex-direction:column; padding-bottom:60px; align-items:stretch;}
+  .content{width:100%; max-width:100%;}
+  .sidebar{
+    position:fixed; top:var(--topbar-h); left:0; right:0; width:100%;
+    max-height:calc(100vh - var(--topbar-h)); overflow-y:auto;
+    padding:18px 20px 24px; margin:0; z-index:150;
+    background:var(--white); border-bottom:1px solid var(--border);
+    box-shadow:0 18px 34px rgba(23,23,23,0.14);
+    transform:translateY(-12px); opacity:0; visibility:hidden;
+    transition:transform .22s ease, opacity .22s ease, visibility .22s ease;
+  }
+  .sidebar.open{transform:translateY(0); opacity:1; visibility:visible;}
+  .sidebar-cta{display:flex; margin-bottom:16px;}
+  .side-link{padding:12px 14px; font-size:14.5px;}
+  .menu-toggle{display:flex;}
+  .crumb{display:none;}
+  .top-actions{gap:10px;}
+  .top-actions .back{display:none;}
+  .top-actions .btn-primary{padding:9px 16px; font-size:13px;}
+  .hero{padding:40px 20px 40px;}
+  .hero h1{font-size:32px;}
+  .hero-lead{font-size:16px;}
+  .layout{padding-left:20px; padding-right:20px;}
+  .topbar{padding:0 20px;}
+  .brand img{height:28px;}
+  .grid2{grid-template-columns:1fr;}
+}
+
+@media (max-width:600px){
+  body{font-size:16px; line-height:1.65;}
+  .brand img{height:24px;}
+  .top-actions{gap:10px;}
+  .hero{padding:32px 18px 36px;}
+  .eyebrow{font-size:11.5px; padding:6px 12px; margin-bottom:16px;}
+  .hero h1{font-size:26px; line-height:1.2;}
+  .hero-lead{font-size:15.5px; margin-bottom:20px;}
+  .hero-stats{flex-direction:column; gap:12px; align-items:flex-start;}
+  .layout{padding:0 18px 60px; gap:0;}
+  .doc-section{padding:28px 0 6px;}
+  .doc-section h2{font-size:22px;}
+  h3{font-size:16px; margin:26px 0 10px;}
+  p{font-size:15px;}
+  ul.check-list li{font-size:14.5px;}
+  .sec-tag{font-size:11px; padding:4px 10px;}
+  .card{padding:14px 16px;}
+  .card p{font-size:13px;}
+  .callout{padding:14px 16px;}
+  table{font-size:12.8px;}
+  thead th, tbody td{padding:9px 12px;}
+  .table-wrap{-webkit-overflow-scrolling:touch;}
+  pre.code{padding:16px 16px; font-size:12px; border-radius:var(--radius-sm);}
+  .code-copy{top:9px; right:9px; padding:5px 10px; font-size:11px;}
+  .back-to-top{right:16px; bottom:16px; width:44px; height:44px;}
+  footer{padding:40px 18px 24px;}
+  .foot-top{flex-direction:column; align-items:flex-start;}
+  .foot-bottom{flex-direction:column; align-items:flex-start; gap:8px;}
+  code{word-break:break-word;}
+}
+
+@media (max-width:480px){
+  .top-actions .btn-primary{display:none;}
+}
+
+@media (max-width:420px){
+  .hero h1{font-size:23px;}
+  .doc-section h2{font-size:20px;}
+  .hero-stats .stat{font-size:13.5px;}
+  .brand img{height:22px;}
+}
+
+@media (max-width:700px){
+  .bg-blob{display:none;}
+}
+</style>
+<noscript><style>.doc-section{opacity:1!important;transform:none!important;}</style></noscript>
+</head>
+<body>
+
+<div class="scroll-progress" id="scrollProgress"></div>
+<div class="bg-grid"></div>
+<div class="bg-blob blob-a"></div>
+<div class="bg-blob blob-b"></div>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="data:image/png;base64,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" alt="FyscalTech">
+    <div class="crumb"><span class="sep">/</span> AML Solution <span class="sep">/</span> <span class="current">API Reference</span></div>
+  </div>
+  <div class="top-actions">
+    <a class="back" href="https://www.fyscaltech.com/ft-aml-solution/">← Back to AML Solution</a>
+    <a class="btn btn-primary" href="https://www.fyscaltech.com/ft-aml-solution/#get-started">Get Started →</a>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu">☰</button>
+  </div>
+</header>
+
+<section class="hero">
+  <span class="eyebrow">Developer documentation</span>
+  <h1>FT AML Platform<br><span class="blue">API Reference</span></h1>
+  <p class="hero-lead">Integrate screening, transaction monitoring, and case management directly into your own systems — submit records, evaluate them against your configured rules, and receive alerts back, without leaving your existing workflow.</p>
+  <div class="hero-stats">
+    <div class="stat"><span class="tick">✓</span> REST &amp; JSON</div>
+    <div class="stat"><span class="tick">✓</span> Bearer token auth</div>
+    <div class="stat"><span class="tick">✓</span> Webhooks for real-time alerts</div>
+  </div>
+</section>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <a class="btn btn-primary sidebar-cta" href="https://www.fyscaltech.com/ft-aml-solution/#get-started">Get Started →</a>
+    <div class="side-title">On this page</div>
+    <a href="#overview" class="side-link" data-target="overview"><span class="side-num">01</span>Overview</a>
+    <a href="#auth" class="side-link" data-target="auth"><span class="side-num">02</span>Authentication</a>
+    <a href="#concepts" class="side-link" data-target="concepts"><span class="side-num">03</span>Core concepts</a>
+    <a href="#endpoints" class="side-link" data-target="endpoints"><span class="side-num">04</span>Endpoints reference</a>
+    <a href="#webhooks" class="side-link" data-target="webhooks"><span class="side-num">05</span>Webhooks</a>
+    <a href="#errors" class="side-link" data-target="errors"><span class="side-num">06</span>Errors &amp; limits</a>
+    <a href="#samples" class="side-link" data-target="samples"><span class="side-num">07</span>Code samples</a>
+    <a href="#changelog" class="side-link" data-target="changelog"><span class="side-num">08</span>Changelog &amp; versioning</a>
+    <a href="#support" class="side-link" data-target="support"><span class="side-num">09</span>Support</a>
+  </aside>
+
+  <main class="content">
+
+    <section class="doc-section" id="overview">
+      <div class="sec-tag">Getting started</div>
+      <h2>Overview</h2>
+      <p>The FT AML API lets your systems talk to the AML Platform directly: push customer or transaction data in, and get screening results, alerts, and case updates back — either by polling or by subscribing to webhooks.</p>
+      <ul class="check-list">
+        <li>All requests and responses use JSON over HTTPS.</li>
+        <li>Every request requires a bearer token (see Authentication below).</li>
+        <li>Endpoints are grouped by the same modules used in the platform itself: Name Screening, Transaction Monitoring, Case Management, and Data Ingestion.</li>
+      </ul>
+      <div class="grid2">
+        <div class="card"><h4>Base URL</h4><p>https://api.ftaml.example/v1</p></div>
+        <div class="card"><h4>Format</h4><p style="font-family:'Inter',sans-serif; color:var(--grey);">JSON request &amp; response, UTF-8</p></div>
+      </div>
+    </section>
+
+    <section class="doc-section" id="auth">
+      <div class="sec-tag">Security</div>
+      <h2>Authentication</h2>
+      <p>Every request must include a bearer token issued to your organization. Contact your account team to generate one.</p>
+      <pre class="code">Authorization: <span class="k">Bearer</span> <span class="s">&lt;api_token&gt;</span>
+Content-Type: <span class="s">application/json</span></pre>
+      <p>Tokens are scoped per environment — use a sandbox token while integrating, and switch to a production token only once your integration is verified.</p>
+    </section>
+
+    <section class="doc-section" id="concepts">
+      <div class="sec-tag">Fundamentals</div>
+      <h2>Core concepts</h2>
+      <p>A handful of ideas show up throughout the API, carried over directly from how the platform itself works:</p>
+      <div class="grid2">
+        <div class="card"><h4>Variable</h4><p style="font-family:'Inter',sans-serif; color:var(--grey);">A named, reusable calculation over your data — e.g. <code>count_sender_txns_1_week</code>. Rules reference variables instead of repeating raw logic.</p></div>
+        <div class="card"><h4>Typology</h4><p style="font-family:'Inter',sans-serif; color:var(--grey);">The category of suspicious behavior a rule detects (e.g. <em>Smurfing</em>). Every alert is tagged with the typology that triggered it.</p></div>
+        <div class="card"><h4>Alert</h4><p style="font-family:'Inter',sans-serif; color:var(--grey);">Raised when a screening match or typology crosses its configured severity threshold.</p></div>
+        <div class="card"><h4>Case</h4><p style="font-family:'Inter',sans-serif; color:var(--grey);">An investigation opened from one or more alerts, ending in a disposition (cleared, or escalated to an STR).</p></div>
+      </div>
+      <p>Relationship flow, end to end:</p>
+      <pre class="code">Customer / Transaction
+  -&gt; Screening or Variable/Typology Evaluation
+  -&gt; Alert
+  -&gt; Case (investigation)
+  -&gt; Disposition
+  -&gt; (optional) STR</pre>
+    </section>
+
+    <section class="doc-section" id="endpoints">
+      <div class="sec-tag">Reference</div>
+      <h2>Endpoints reference</h2>
+      <div class="callout"><strong>Draft — pending verification.</strong>&nbsp;<p style="display:inline; margin:0;">These paths and payload shapes are a proposed structure based on the platform's feature set. No confirmed API specification was available while drafting this page — check every path, field name, and status code against the real implementation before this goes live.</p></div>
+
+      <h3>Name screening</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Method &amp; path</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td class="method m-post"><span class="pill pill-post">POST</span>/screening/manual</td><td>Submit a single individual or entity for manual screening</td></tr>
+          <tr><td class="method m-post"><span class="pill pill-post">POST</span>/screening/batch</td><td>Submit a batch of records for screening</td></tr>
+          <tr><td class="method m-get"><span class="pill pill-get">GET</span>/screening/jobs/{jobId}</td><td>Check the status of a batch or delta screening job</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Transaction monitoring</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Method &amp; path</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td class="method m-get"><span class="pill pill-get">GET</span>/variables</td><td>List available variables</td></tr>
+          <tr><td class="method m-post"><span class="pill pill-post">POST</span>/variables</td><td>Create a new variable</td></tr>
+          <tr><td class="method m-get"><span class="pill pill-get">GET</span>/typologies</td><td>List transaction monitoring typologies (rules)</td></tr>
+          <tr><td class="method m-post"><span class="pill pill-post">POST</span>/typologies</td><td>Create or update a typology</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Case management</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Method &amp; path</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td class="method m-get"><span class="pill pill-get">GET</span>/alerts</td><td>Query alerts by severity, status, or date</td></tr>
+          <tr><td class="method m-patch"><span class="pill pill-patch">PATCH</span>/cases/{caseId}/disposition</td><td>Record an investigation outcome on a case</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Data ingestion</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Method &amp; path</th><th>Purpose</th></tr></thead>
+        <tbody>
+          <tr><td class="method m-get"><span class="pill pill-get">GET</span>/ingestion/watchlist/jobs</td><td>List watchlist ingestion job history</td></tr>
+          <tr><td class="method m-get"><span class="pill pill-get">GET</span>/ingestion/tms/jobs</td><td>List transaction data ingestion job history</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Example — create a variable &amp; typology</h3>
+      <pre class="code"><span class="m">POST</span> /variables
+{
+  <span class="k">"name"</span>: <span class="s">"Cash_Deposit_Count_7D"</span>,
+  <span class="k">"type"</span>: <span class="s">"Int"</span>,
+  <span class="k">"computation"</span>: {
+    <span class="k">"aggregation"</span>: <span class="s">"count"</span>,
+    <span class="k">"filter"</span>: { <span class="k">"channel"</span>: <span class="s">"cash_deposit"</span> },
+    <span class="k">"window"</span>: <span class="s">"7d"</span>,
+    <span class="k">"group_by"</span>: <span class="s">"account_id"</span>
+  }
+}
+
+<span class="m">POST</span> /typologies
+{
+  <span class="k">"name"</span>: <span class="s">"Structuring - Frequent Sub-Threshold Cash Deposits"</span>,
+  <span class="k">"conditions"</span>: { <span class="k">"all"</span>: [
+    { <span class="k">"variable"</span>: <span class="s">"VAR-1042"</span>, <span class="k">"operator"</span>: <span class="s">"&gt;="</span>, <span class="k">"value"</span>: 4 },
+    { <span class="k">"variable"</span>: <span class="s">"VAR-1055"</span>, <span class="k">"operator"</span>: <span class="s">"&lt;"</span>,  <span class="k">"value"</span>: 10000 }
+  ]},
+  <span class="k">"risk_score"</span>: 78, <span class="k">"severity_hint"</span>: <span class="s">"High"</span>, <span class="k">"status"</span>: <span class="s">"active"</span>
+}</pre>
+
+      <h3>Example — query alerts &amp; record a disposition</h3>
+      <pre class="code"><span class="m">GET</span> /alerts?severity=High&amp;status=open
+
+<span class="c">200 OK</span>
+{
+  <span class="k">"results"</span>: [
+    { <span class="k">"alert_id"</span>: <span class="s">"ALT-55012"</span>, <span class="k">"typology_id"</span>: <span class="s">"TYP-2031"</span>, <span class="k">"severity"</span>: <span class="s">"High"</span>, <span class="k">"status"</span>: <span class="s">"open"</span> }
+  ],
+  <span class="k">"page"</span>: 1, <span class="k">"page_size"</span>: 50, <span class="k">"total"</span>: 1
+}
+
+<span class="m">PATCH</span> /cases/CASE-2026-0000087/disposition
+{
+  <span class="k">"disposition"</span>: <span class="s">"escalate_str"</span>,
+  <span class="k">"notes"</span>: <span class="s">"Confirmed structuring pattern, filing STR."</span>
+}</pre>
+
+      <h3>Example — manual screening request</h3>
+      <pre class="code"><span class="m">POST</span> /screening/manual
+Authorization: Bearer &lt;api_token&gt;
+Content-Type: application/json
+
+{
+  <span class="k">"name"</span>: <span class="s">"John Doe"</span>,
+  <span class="k">"entity_type"</span>: <span class="s">"individual"</span>,
+  <span class="k">"dob"</span>: <span class="s">"1985-04-12"</span>,
+  <span class="k">"citizenship"</span>: <span class="s">"GBR"</span>
+}</pre>
+      <pre class="code"><span class="c">200 OK</span>
+{
+  <span class="k">"screening_id"</span>: <span class="s">"SCR-88213"</span>,
+  <span class="k">"status"</span>: <span class="s">"completed"</span>,
+  <span class="k">"match_score"</span>: 91,
+  <span class="k">"matches"</span>: [
+    { <span class="k">"watchlist_id"</span>: <span class="s">"WL-3391"</span>, <span class="k">"name"</span>: <span class="s">"Jon Doe"</span>, <span class="k">"score"</span>: 91, <span class="k">"category"</span>: <span class="s">"PEP"</span> }
+  ]
+}</pre>
+    </section>
+
+    <section class="doc-section" id="webhooks">
+      <div class="sec-tag">Real-time</div>
+      <h2>Webhooks</h2>
+      <p>Subscribe to receive alerts as they're generated, instead of polling. Configure your callback URL in Account &gt; Integrations.</p>
+      <h3>Example — alert created</h3>
+      <pre class="code"><span class="m">POST</span> &lt;your_webhook_url&gt;
+Content-Type: application/json
+
+{
+  <span class="k">"event"</span>: <span class="s">"alert.created"</span>,
+  <span class="k">"alert_id"</span>: <span class="s">"ALT-55012"</span>,
+  <span class="k">"typology_id"</span>: <span class="s">"TYP-2031"</span>,
+  <span class="k">"account_id"</span>: <span class="s">"ACC-77410"</span>,
+  <span class="k">"risk_score"</span>: 78,
+  <span class="k">"severity"</span>: <span class="s">"High"</span>,
+  <span class="k">"sla_deadline"</span>: <span class="s">"2026-07-13T09:00:00Z"</span>
+}</pre>
+      <p>Retry policy, signing secret, and delivery guarantees: to be confirmed with engineering.</p>
+    </section>
+
+    <section class="doc-section" id="errors">
+      <div class="sec-tag">Reliability</div>
+      <h2>Errors</h2>
+      <p>Failed requests return a JSON error body alongside a standard HTTP status code:</p>
+      <pre class="code">{
+  <span class="k">"error"</span>: {
+    <span class="k">"code"</span>: <span class="s">"invalid_request"</span>,
+    <span class="k">"message"</span>: <span class="s">"citizenship must be a valid ISO-3166 country code"</span>
+  }
+}</pre>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Status</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td>400</td><td>Request was malformed or failed validation</td></tr>
+          <tr><td>401</td><td>Missing or invalid bearer token</td></tr>
+          <tr><td>404</td><td>Resource not found (e.g. unknown job or case ID)</td></tr>
+          <tr><td>429</td><td>Rate limit exceeded — see below</td></tr>
+          <tr><td>500</td><td>Unexpected server error — retry with backoff</td></tr>
+        </tbody>
+      </table></div>
+      <h3>Rate limits</h3>
+      <p>Default limit: <strong>100 requests/minute</strong> per API key. Batch endpoints (<code>/screening/batch</code>, ingestion) are subject to separate, higher size limits per job rather than per request.</p>
+      <pre class="code"><span class="c">429 Too Many Requests</span>
+{
+  <span class="k">"error"</span>: { <span class="k">"code"</span>: <span class="s">"rate_limited"</span>, <span class="k">"retry_after"</span>: 12 }
+}</pre>
+
+      <h3>Pagination</h3>
+      <p>List endpoints return a page of results with a total count. Always check for a next page rather than assuming a single response contains the full result set.</p>
+      <pre class="code"><span class="m">GET</span> /alerts?page=2&amp;page_size=50</pre>
+
+      <h3>Idempotency</h3>
+      <p>For POST endpoints that create records (<code>/screening/manual</code>, <code>/typologies</code>), pass an <code>Idempotency-Key</code> header so a retried request — after a timeout, for example — doesn't create a duplicate record.</p>
+      <pre class="code">Idempotency-Key: 3f29a1e2-9c3b-4e11-9e2a-6b1d4a0f9c11</pre>
+
+      <div class="callout"><strong>Draft — pending verification.</strong>&nbsp;<p style="display:inline; margin:0;">Exact rate limit thresholds and the pagination default page size are illustrative and not yet confirmed with engineering.</p></div>
+    </section>
+
+    <section class="doc-section" id="samples">
+      <div class="sec-tag">Quickstart</div>
+      <h2>Code samples</h2>
+      <p>The same manual screening call from Overview, in a couple of common languages.</p>
+      <h3>cURL</h3>
+      <pre class="code"><span class="c">curl -X POST https://api.ftaml.example/v1/screening/manual \</span>
+  -H <span class="s">"Authorization: Bearer &lt;API_KEY&gt;"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"name": "John Doe", "entity_type": "individual", "dob": "1985-04-12", "citizenship": "GBR"}'</span></pre>
+      <h3>Python</h3>
+      <pre class="code"><span class="k">import</span> requests
+
+API_KEY = <span class="s">"..."</span>
+BASE = <span class="s">"https://api.ftaml.example/v1"</span>
+
+resp = requests.post(
+    f<span class="s">"{BASE}/screening/manual"</span>,
+    headers={<span class="s">"Authorization"</span>: f<span class="s">"Bearer {API_KEY}"</span>},
+    json={<span class="s">"name"</span>: <span class="s">"John Doe"</span>, <span class="s">"entity_type"</span>: <span class="s">"individual"</span>,
+          <span class="s">"dob"</span>: <span class="s">"1985-04-12"</span>, <span class="s">"citizenship"</span>: <span class="s">"GBR"</span>},
+)
+<span class="k">print</span>(resp.json())</pre>
+      <h3>Node.js</h3>
+      <pre class="code"><span class="k">const</span> res = <span class="k">await</span> fetch(<span class="s">"https://api.ftaml.example/v1/screening/manual"</span>, {
+  method: <span class="s">"POST"</span>,
+  headers: {
+    <span class="s">"Authorization"</span>: `Bearer ${process.env.FTAML_API_KEY}`,
+    <span class="s">"Content-Type"</span>: <span class="s">"application/json"</span>,
+  },
+  body: JSON.stringify({
+    name: <span class="s">"John Doe"</span>, entity_type: <span class="s">"individual"</span>,
+    dob: <span class="s">"1985-04-12"</span>, citizenship: <span class="s">"GBR"</span>,
+  }),
+});
+<span class="k">const</span> data = <span class="k">await</span> res.json();</pre>
+    </section>
+
+    <section class="doc-section" id="changelog">
+      <div class="sec-tag">Stability</div>
+      <h2>Changelog &amp; versioning</h2>
+      <ul class="check-list">
+        <li>The API is versioned in the URL path (<code>/v1/...</code>); breaking changes ship under a new version prefix (<code>/v2/...</code>).</li>
+        <li>Non-breaking additions — new optional fields, new endpoints — may appear within a version without notice.</li>
+        <li>Deprecated endpoints are marked in this reference and supported for a minimum notice period before removal.</li>
+      </ul>
+      <div class="callout"><strong>Draft — pending verification.</strong>&nbsp;<p style="display:inline; margin:0;">This versioning policy is a proposed default, not a documented commitment yet.</p></div>
+    </section>
+
+    <section class="doc-section" id="support">
+      <div class="sec-tag">We're here</div>
+      <h2>Support</h2>
+      <ul class="check-list">
+        <li>Email: <a href="mailto:hello@fyscaltech.com">hello@fyscaltech.com</a></li>
+        <li>Phone: <a href="tel:+6580805424">+65 8080 5424</a></li>
+        <li>Headquarters &mdash; Singapore · 68 Circular Road</li>
+        <li>Account-level issues (API key provisioning, permissions) — contact your organization's Admin</li>
+      </ul>
+      <p class="thanks">If this reference doesn't answer your question, that's a gap we want to close.</p>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  <div class="foot-inner">
+    <div class="foot-top">
+      <div class="foot-brand"><img src="data:image/png;base64,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" alt="FyscalTech"></div>
+      <a class="btn btn-primary" href="mailto:hello@fyscaltech.com">Contact developer support →</a>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Fyscal Technologies PTE LTD. All rights reserved.</span>
+      <span><a href="https://www.fyscaltech.com/privacy-policy/">Privacy Policy</a> &nbsp;·&nbsp; <a href="https://www.fyscaltech.com/terms-of-use/">Terms of Use</a> &nbsp;·&nbsp; <a href="https://www.fyscaltech.com/contact/">Contact</a></span>
+    </div>
+  </div>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top">↑</button>
+<script>
+const sidebarEl = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebarOverlay');
+function openSidebar(){ sidebarEl.classList.add('open'); sidebarOverlay.classList.add('show'); document.body.style.overflow='hidden'; }
+function closeSidebar(){ sidebarEl.classList.remove('open'); sidebarOverlay.classList.remove('show'); document.body.style.overflow=''; }
+document.getElementById('menuToggle').addEventListener('click', function(){
+  if(sidebarEl.classList.contains('open')){ closeSidebar(); } else { openSidebar(); }
+});
+sidebarOverlay.addEventListener('click', closeSidebar);
+document.addEventListener('keydown', (e)=>{ if(e.key === 'Escape') closeSidebar(); });
+const links = document.querySelectorAll('.side-link');
+const secs = document.querySelectorAll('.doc-section');
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      links.forEach(l=>l.classList.remove('active'));
+      const id = e.target.getAttribute('id');
+      const match = document.querySelector('.side-link[data-target="'+id+'"]');
+      if(match) match.classList.add('active');
+    }
+  });
+}, {rootMargin:'-20% 0px -70% 0px'});
+secs.forEach(s=>io.observe(s));
+links.forEach(l=>l.addEventListener('click', closeSidebar));
+
+/* --- Scroll progress bar --- */
+const progressBar = document.getElementById('scrollProgress');
+function updateProgress(){
+  const h = document.documentElement;
+  const scrolled = (h.scrollTop) / (h.scrollHeight - h.clientHeight) * 100;
+  progressBar.style.width = scrolled + '%';
+}
+document.addEventListener('scroll', updateProgress, {passive:true});
+updateProgress();
+
+/* --- Back to top button --- */
+const backToTop = document.getElementById('backToTop');
+document.addEventListener('scroll', ()=>{
+  if(window.scrollY > 480){ backToTop.classList.add('show'); } else { backToTop.classList.remove('show'); }
+}, {passive:true});
+backToTop.addEventListener('click', ()=> window.scrollTo({top:0, behavior:'smooth'}));
+
+/* --- Reveal sections on scroll (with safe fallback so content is never stuck hidden) --- */
+const revealTargets = document.querySelectorAll('.doc-section');
+if('IntersectionObserver' in window){
+  const revealIO = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in-view'); revealIO.unobserve(e.target); }
+    });
+  }, {threshold:0.05, rootMargin:'0px 0px -40px 0px'});
+  revealTargets.forEach(s=>revealIO.observe(s));
+} else {
+  revealTargets.forEach(s=>s.classList.add('in-view'));
+}
+window.addEventListener('load', ()=>{
+  setTimeout(()=>{ revealTargets.forEach(s=>s.classList.add('in-view')); }, 1200);
+});
+
+/* --- Copyable heading anchors --- */
+document.querySelectorAll('.doc-section > h2').forEach(h=>{
+  const sec = h.closest('.doc-section');
+  if(!sec || !sec.id) return;
+  const a = document.createElement('span');
+  a.className = 'h2-anchor';
+  a.textContent = '\ud83d\udd17';
+  a.title = 'Copy link to this section';
+  a.addEventListener('click', (ev)=>{
+    ev.stopPropagation();
+    const url = window.location.origin + window.location.pathname + '#' + sec.id;
+    navigator.clipboard.writeText(url).catch(()=>{});
+    a.textContent = '\u2713';
+    setTimeout(()=>{ a.textContent = '\ud83d\udd17'; }, 1200);
+  });
+  h.appendChild(a);
+});
+
+/* --- Copy-to-clipboard buttons on code samples --- */
+document.querySelectorAll('pre.code').forEach(pre=>{
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+  const btn = document.createElement('button');
+  btn.className = 'code-copy';
+  btn.type = 'button';
+  btn.textContent = 'Copy';
+  btn.addEventListener('click', ()=>{
+    navigator.clipboard.writeText(pre.innerText).then(()=>{
+      btn.textContent = 'Copied';
+      btn.classList.add('copied');
+      setTimeout(()=>{ btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1400);
+    }).catch(()=>{});
+  });
+  wrap.appendChild(btn);
+});
+
+
+/* --- Table horizontal-scroll hint (only shows when there is real overflow, clears once fully scrolled) --- */
+const SCROLL_END_SLOP = 6; // px tolerance for subpixel / zoom rounding across browsers
+function isAtScrollEnd(tw){
+  return Math.ceil(tw.scrollLeft) + tw.clientWidth >= tw.scrollWidth - SCROLL_END_SLOP;
+}
+function refreshTableScrollHints(){
+  document.querySelectorAll('.table-wrap').forEach(tw=>{
+    const scrollable = tw.scrollWidth > tw.clientWidth + SCROLL_END_SLOP;
+    tw.classList.toggle('scrollable', scrollable);
+    tw.classList.toggle('at-end', !scrollable || isAtScrollEnd(tw));
+  });
+}
+document.querySelectorAll('.table-wrap').forEach(tw=>{
+  tw.addEventListener('scroll', ()=>{
+    tw.classList.toggle('at-end', isAtScrollEnd(tw));
+  }, {passive:true});
+});
+refreshTableScrollHints();
+window.addEventListener('resize', refreshTableScrollHints);
+window.addEventListener('load', refreshTableScrollHints);
+window.addEventListener('load', ()=> setTimeout(refreshTableScrollHints, 500));
+</script>
+</body>
+</html>
 
